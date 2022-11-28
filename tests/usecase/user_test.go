@@ -45,18 +45,12 @@ func Test_User_VerifyLogin(t *testing.T) {
 	repo := user.NewRepository(db)
 	useCase := user.NewService(repo)
 
+	testUser, _ := repo.FindByID(1)
+
 	t.Run("invalid user credential should return error", func(t *testing.T) {
-		newUser := user.RegisterUserInput{
-			Name:       faker.New().Person().Name(),
-			Occupation: faker.New().Company().JobTitle(),
-			Email:      faker.New().Internet().Email(),
-			Password:   faker.New().Internet().Password(),
-		}
-		_, err := useCase.RegisterUser(newUser)
-		assert.Nil(t, err)
 
 		loginData := user.LoginUserInput{
-			Email:    newUser.Email,
+			Email:    testUser.Email,
 			Password: faker.New().Internet().Password(),
 		}
 
