@@ -1,7 +1,7 @@
 package main
 
 import (
-	"jangFundraising/handler"
+	"jangFundraising/delivery"
 	"jangFundraising/user"
 	"log"
 
@@ -11,16 +11,23 @@ import (
 )
 
 func main() {
-	dsn := "root:Pasuruan_123@tcp(127.0.0.1:3306)/fundraising?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := ""
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
+	databaseConn, err := db.DB()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	defer databaseConn.Close()
+
 	userRepository := user.NewRepository(db)
 	userService := user.NewService(userRepository)
-	userHandler := handler.NewUserHandler(userService)
+	userHandler := delivery.NewUserHandler(userService)
 
 	router := gin.Default()
 	api := router.Group("/api/v1")
