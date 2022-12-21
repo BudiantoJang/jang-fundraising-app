@@ -69,23 +69,17 @@ func (h *userHandler) Login(c *gin.Context) {
 func (h *userHandler) CheckEmailAvailability(c *gin.Context) {
 	var input user.CheckEmailInput
 
-	err := c.ShouldBind(&input)
+	err := c.ShouldBindJSON(&input)
 	if err != nil {
 		errors := helper.FormatErrorValidation(err)
 		errorMessage := gin.H{"errors": errors}
 
 		resp := helper.APIResponse("failed binding the payload", http.StatusUnprocessableEntity, "error", errorMessage)
 		c.JSON(http.StatusUnprocessableEntity, resp)
+		return
 	}
 
-	isEmailAvailable, err := h.userService.IsEmailAvailable(input)
-	if err != nil {
-		errors := helper.FormatErrorValidation(err)
-		errorMessage := gin.H{"errors": errors}
-
-		resp := helper.APIResponse("failed checking emial availability", http.StatusUnprocessableEntity, "error", errorMessage)
-		c.JSON(http.StatusUnprocessableEntity, resp)
-	}
+	isEmailAvailable, _ := h.userService.IsEmailAvailable(input)
 
 	data := gin.H{
 		"isAvailable": isEmailAvailable,
@@ -98,5 +92,38 @@ func (h *userHandler) CheckEmailAvailability(c *gin.Context) {
 	}
 
 	resp := helper.APIResponse(metaMessage, http.StatusOK, "succes", data)
+	c.JSON(http.StatusOK, resp)
+}
+
+func (h *userHandler) UploadAvatar(c *gin.Context) {
+	file, err := c.FormFile("avatar")
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		resp := helper.APIResponse("Failed saving avatar image", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusUnprocessableEntity, resp)
+		return
+	}
+
+	path := "../images" + file.Filename
+	err = c.SaveUploadedFile(file, path)
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		resp := helper.APIResponse("Failed saving avatar image", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusUnprocessableEntity, resp)
+		return
+	}
+
+	//harusnya dari jwt
+	userID := 1
+	_, err = h.userService.SaveAvatar(userID, path)
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		resp := helper.APIResponse("Failed saving avatar image", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusUnprocessableEntity, resp)
+		return
+	}
+
+	data := gin.H{"is_uploaded": true}
+	resp := helper.APIResponse("Avatar successfully updated", http.StatusOK, "success", data)
 	c.JSON(http.StatusOK, resp)
 }

@@ -77,3 +77,24 @@ func Test_User_VerifyLogin(t *testing.T) {
 		assert.Nil(t, err)
 	})
 }
+
+func Test_User_IsEmailAvailable(t *testing.T) {
+	dsn := "root:Pasuruan_123@tcp(127.0.0.1:3306)/fundraising?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	repo := user.NewRepository(db)
+	useCase := user.NewService(repo)
+
+	testUser, _ := repo.FindByID(1)
+
+	emailCheck := user.CheckEmailInput{
+		Email: testUser.Email,
+	}
+
+	_, err = useCase.IsEmailAvailable(emailCheck)
+	assert.Nil(t, err)
+}
