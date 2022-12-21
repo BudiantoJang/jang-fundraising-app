@@ -8,13 +8,13 @@ type UserRegistrationFormatter struct {
 	Token      string `json:"token"`
 }
 
-func FormatUser(user User) UserRegistrationFormatter {
+func FormatUser(user User, token string) UserRegistrationFormatter {
 	formattedUser := UserRegistrationFormatter{
 		ID:         user.ID,
 		Name:       user.Name,
 		Occupation: user.Occupation,
 		Email:      user.Email,
-		Token:      user.PasswordHash,
+		Token:      token,
 	}
 
 	return formattedUser

@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"fmt"
+	"jangFundraising/auth"
 	"jangFundraising/helper"
 	"jangFundraising/user"
 	"net/http"
@@ -11,10 +12,11 @@ import (
 
 type userHandler struct {
 	userService user.Service
+	authService auth.JWTService
 }
 
-func NewUserHandler(userService user.Service) *userHandler {
-	return &userHandler{userService}
+func NewUserHandler(userService user.Service, authService auth.JWTService) *userHandler {
+	return &userHandler{userService, authService}
 }
 
 func (h *userHandler) RegisterUser(c *gin.Context) {
@@ -37,7 +39,15 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 		return
 	}
 
-	formattedUser := user.FormatUser(usr)
+	token, err := h.authService.GenerateToken(usr.ID)
+
+	if err != nil {
+		resp := helper.APIResponse("error while trying to register user", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	formattedUser := user.FormatUser(usr, token)
 	resp := helper.APIResponse("account has been created", http.StatusOK, "success", formattedUser)
 	c.JSON(http.StatusOK, resp)
 }
@@ -62,7 +72,15 @@ func (h *userHandler) Login(c *gin.Context) {
 		return
 	}
 
-	formattedUser := user.FormatUser(verifiedUser)
+	token, err := h.authService.GenerateToken(verifiedUser.ID)
+
+	if err != nil {
+		resp := helper.APIResponse("error while trying to login", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	formattedUser := user.FormatUser(verifiedUser, token)
 	resp := helper.APIResponse("login success", http.StatusOK, "success", formattedUser)
 	c.JSON(http.StatusOK, resp)
 }

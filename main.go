@@ -1,6 +1,7 @@
 package main
 
 import (
+	"jangFundraising/auth"
 	"jangFundraising/delivery"
 	"jangFundraising/user"
 	"log"
@@ -26,10 +27,11 @@ func main() {
 	defer databaseConn.Close()
 
 	userRepository := user.NewRepository(db)
-	userService := user.NewService(userRepository)
-	userHandler := delivery.NewUserHandler(userService)
 
-	userService.SaveAvatar(1, "halo.com")
+	userService := user.NewService(userRepository)
+	authService := auth.NewService()
+
+	userHandler := delivery.NewUserHandler(userService, *authService)
 
 	router := gin.Default()
 	api := router.Group("/api/v1")

@@ -75,8 +75,8 @@ func (s *service) IsEmailAvailable(input CheckEmailInput) (bool, error) {
 	return true, nil
 }
 
-func (s *service) SaveAvatar(id int, fileLocation string) (User, error) {
-	usr, err := s.repository.FindByID(id)
+func (s *service) SaveAvatar(ID int, fileLocation string) (User, error) {
+	usr, err := s.repository.FindByID(ID)
 	if err != nil {
 		return usr, err
 	}
