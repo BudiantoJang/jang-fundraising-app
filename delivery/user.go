@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"fmt"
 	"jangFundraising/helper"
 	"jangFundraising/user"
 	"net/http"
@@ -104,7 +105,11 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 		return
 	}
 
-	path := "../images" + file.Filename
+	//harusnya dari jwt
+	userID := 1
+
+	path := fmt.Sprintf("images/%d-%s", userID, file.Filename)
+
 	err = c.SaveUploadedFile(file, path)
 	if err != nil {
 		data := gin.H{"is_uploaded": false}
@@ -113,8 +118,6 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 		return
 	}
 
-	//harusnya dari jwt
-	userID := 1
 	_, err = h.userService.SaveAvatar(userID, path)
 	if err != nil {
 		data := gin.H{"is_uploaded": false}
