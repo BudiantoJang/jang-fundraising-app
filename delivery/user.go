@@ -11,11 +11,11 @@ import (
 )
 
 type userHandler struct {
-	userService user.Service
+	userService user.Usecase
 	authService auth.JWTService
 }
 
-func NewUserHandler(userService user.Service, authService auth.JWTService) *userHandler {
+func NewUserHandler(userService user.Usecase, authService auth.JWTService) *userHandler {
 	return &userHandler{userService, authService}
 }
 

@@ -6,22 +6,22 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type Service interface {
+type Usecase interface {
 	RegisterUser(input RegisterUserInput) (User, error)
 	VerifyLogin(input LoginUserInput) (User, error)
 	IsEmailAvailable(input CheckEmailInput) (bool, error)
 	SaveAvatar(id int, fileLocation string) (User, error)
 }
 
-type service struct {
+type usecase struct {
 	repository Repository
 }
 
-func NewService(repository Repository) *service {
-	return &service{repository}
+func NewUsecase(repository Repository) *usecase {
+	return &usecase{repository}
 }
 
-func (s *service) RegisterUser(input RegisterUserInput) (User, error) {
+func (s *usecase) RegisterUser(input RegisterUserInput) (User, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.MinCost)
 	if err != nil {
 		return User{}, err
@@ -44,7 +44,7 @@ func (s *service) RegisterUser(input RegisterUserInput) (User, error) {
 	return newUser, nil
 }
 
-func (s *service) VerifyLogin(input LoginUserInput) (User, error) {
+func (s *usecase) VerifyLogin(input LoginUserInput) (User, error) {
 	usr, err := s.repository.FindByEmail(input.Email)
 	if err != nil {
 		return usr, err
@@ -62,7 +62,7 @@ func (s *service) VerifyLogin(input LoginUserInput) (User, error) {
 	return usr, nil
 }
 
-func (s *service) IsEmailAvailable(input CheckEmailInput) (bool, error) {
+func (s *usecase) IsEmailAvailable(input CheckEmailInput) (bool, error) {
 	usr, err := s.repository.FindByEmail(input.Email)
 	if err != nil {
 		return false, err
@@ -75,7 +75,7 @@ func (s *service) IsEmailAvailable(input CheckEmailInput) (bool, error) {
 	return true, nil
 }
 
-func (s *service) SaveAvatar(ID int, fileLocation string) (User, error) {
+func (s *usecase) SaveAvatar(ID int, fileLocation string) (User, error) {
 	usr, err := s.repository.FindByID(ID)
 	if err != nil {
 		return usr, err

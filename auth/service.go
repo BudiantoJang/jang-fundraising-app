@@ -6,7 +6,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-type Service interface {
+type Usecase interface {
 	GenerateToken(userID int) (string, error)
 	ValidateToken(token string) (*jwt.Token, error)
 }
@@ -14,7 +14,7 @@ type Service interface {
 type JWTService struct {
 }
 
-func NewService() *JWTService {
+func NewUsecase() *JWTService {
 	return &JWTService{}
 }
 

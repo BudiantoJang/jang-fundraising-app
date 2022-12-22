@@ -20,7 +20,7 @@ func Test_User_RegisterUser(t *testing.T) {
 	}
 
 	repo := user.NewRepository(db)
-	useCase := user.NewService(repo)
+	useCase := user.NewUsecase(repo)
 
 	t.Run("inserting new user must not return error", func(t *testing.T) {
 		newUser := user.RegisterUserInput{
@@ -43,7 +43,7 @@ func Test_User_VerifyLogin(t *testing.T) {
 	}
 
 	repo := user.NewRepository(db)
-	useCase := user.NewService(repo)
+	useCase := user.NewUsecase(repo)
 
 	testUser, _ := repo.FindByID(1)
 
@@ -87,7 +87,7 @@ func Test_User_IsEmailAvailable(t *testing.T) {
 	}
 
 	repo := user.NewRepository(db)
-	useCase := user.NewService(repo)
+	useCase := user.NewUsecase(repo)
 
 	testUser, _ := repo.FindByID(1)
 

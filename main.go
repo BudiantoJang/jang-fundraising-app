@@ -31,25 +31,32 @@ func main() {
 
 	defer databaseConn.Close()
 
+	//Middleware
+	authUsecase := auth.NewUsecase()
+
 	//User
 	userRepository := user.NewRepository(db)
-
-	userService := user.NewService(userRepository)
-	authService := auth.NewService()
-
-	userHandler := delivery.NewUserHandler(userService, *authService)
+	userUsecase := user.NewUsecase(userRepository)
+	userHandler := delivery.NewUserHandler(userUsecase, *authUsecase)
 
 	// Campaign
 
 	campaignRepository := campaign.NewRepository(db)
+	campaignUsecase := campaign.NewUsecase(campaignRepository)
+	campaignHandler := delivery.NewCampaignHandler(campaignUsecase)
 
 	router := gin.Default()
+
 	api := router.Group("/api/v1")
 
-	api.POST("/users", userHandler.RegisterUser)
-	api.POST("/sessions", userHandler.Login)
-	api.POST("/email_check", userHandler.CheckEmailAvailability)
-	api.POST("/avatar", authMiddleware(*authService, userRepository), userHandler.UploadAvatar)
+	user := api.Group("/user")
+	user.POST("/", userHandler.RegisterUser)
+	user.POST("/sessions", userHandler.Login)
+	user.POST("/email_check", userHandler.CheckEmailAvailability)
+	user.POST("/avatar", authMiddleware(*authUsecase, userRepository), userHandler.UploadAvatar)
+
+	campaigns := api.Group("/campaigns")
+	campaigns.GET("/", campaignHandler.GetCampaigns)
 
 	router.Run()
 }
