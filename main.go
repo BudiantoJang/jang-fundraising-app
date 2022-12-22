@@ -3,10 +3,14 @@ package main
 import (
 	"jangFundraising/auth"
 	"jangFundraising/delivery"
+	"jangFundraising/helper"
 	"jangFundraising/user"
 	"log"
+	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v4"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -39,7 +43,47 @@ func main() {
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/sessions", userHandler.Login)
 	api.POST("/email_check", userHandler.CheckEmailAvailability)
-	api.POST("/avatar", userHandler.UploadAvatar)
+	api.POST("/avatar", authMiddleware(*authService, userRepository), userHandler.UploadAvatar)
 
 	router.Run()
+}
+
+func authMiddleware(autService auth.JWTService, userService user.Repository) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		authHeader := c.GetHeader("Authorization")
+
+		if !strings.Contains(authHeader, "Bearer") {
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+		}
+
+		bearer := strings.Split(authHeader, " ")
+		stringToken := bearer[1]
+
+		token, err := autService.ValidateToken(stringToken)
+		if err != nil {
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+		}
+
+		payload, ok := token.Claims.(jwt.MapClaims)
+		if !ok || !token.Valid {
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+		}
+
+		userID := int(payload["user_id"].(float64))
+
+		user, err := userService.FindByID(userID)
+		if err != nil {
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+		}
+
+		c.Set("currentUser", user)
+	}
 }
