@@ -1,6 +1,6 @@
 package user
 
-type UserRegistrationFormatter struct {
+type UserFormatter struct {
 	ID         int    `json:"id"`
 	Name       string `json:"name"`
 	Occupation string `json:"occupation"`
@@ -8,8 +8,8 @@ type UserRegistrationFormatter struct {
 	Token      string `json:"token"`
 }
 
-func FormatUser(user User, token string) UserRegistrationFormatter {
-	formattedUser := UserRegistrationFormatter{
+func FormatUser(user User, token string) UserFormatter {
+	formattedUser := UserFormatter{
 		ID:         user.ID,
 		Name:       user.Name,
 		Occupation: user.Occupation,
