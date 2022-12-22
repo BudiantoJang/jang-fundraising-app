@@ -2,6 +2,7 @@ package main
 
 import (
 	"jangFundraising/auth"
+	"jangFundraising/campaign"
 	"jangFundraising/delivery"
 	"jangFundraising/helper"
 	"jangFundraising/user"
@@ -30,12 +31,17 @@ func main() {
 
 	defer databaseConn.Close()
 
+	//User
 	userRepository := user.NewRepository(db)
 
 	userService := user.NewService(userRepository)
 	authService := auth.NewService()
 
 	userHandler := delivery.NewUserHandler(userService, *authService)
+
+	// Campaign
+
+	campaignRepository := campaign.NewRepository(db)
 
 	router := gin.Default()
 	api := router.Group("/api/v1")
