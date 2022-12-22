@@ -46,7 +46,7 @@ func main() {
 	campaignHandler := delivery.NewCampaignHandler(campaignUsecase)
 
 	router := gin.Default()
-
+	router.Static("/images", "./images")
 	api := router.Group("/api/v1")
 
 	user := api.Group("/user")
