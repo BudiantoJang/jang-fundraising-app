@@ -35,7 +35,7 @@ type GetCampaignDetailInput struct {
 	ID int `uri:"id" binding:"required"`
 }
 
-type CreateCampaignInput struct {
+type CampaignInput struct {
 	Name        string `json:"name" binding:"required"`
 	Summary     string `json:"summary" binding:"required"`
 	Description string `json:"description" binding:"required"`

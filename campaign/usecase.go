@@ -1,6 +1,7 @@
 package campaign
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/gosimple/slug"
@@ -9,7 +10,8 @@ import (
 type Usecase interface {
 	GetCampaigns(userID int) ([]Campaign, error)
 	GetCampaignByID(input GetCampaignDetailInput) (Campaign, error)
-	CreateCampaign(input CreateCampaignInput) (Campaign, error)
+	CreateCampaign(input CampaignInput) (Campaign, error)
+	Update(inputID GetCampaignDetailInput, inputData CampaignInput) (Campaign, error)
 }
 
 type usecase struct {
@@ -45,7 +47,7 @@ func (u *usecase) GetCampaignByID(input GetCampaignDetailInput) (Campaign, error
 	return campaign, nil
 }
 
-func (u *usecase) CreateCampaign(input CreateCampaignInput) (Campaign, error) {
+func (u *usecase) CreateCampaign(input CampaignInput) (Campaign, error) {
 	campaign := Campaign{
 		Name:        input.Name,
 		Summary:     input.Summary,
@@ -66,4 +68,29 @@ func (u *usecase) CreateCampaign(input CreateCampaignInput) (Campaign, error) {
 	}
 
 	return newCampaign, nil
+}
+
+func (u *usecase) Update(inputID GetCampaignDetailInput, inputData CampaignInput) (Campaign, error) {
+	campaign, err := u.repository.FindByID(inputID.ID)
+	if err != nil {
+		return campaign, err
+	}
+
+	campaign.Name = inputData.Name
+	campaign.Summary = inputData.Summary
+	campaign.Description = inputData.Description
+	campaign.Perks = inputData.Perks
+	campaign.GoalAmount = inputData.GoalAmount
+
+	if inputID.ID != inputData.User.ID {
+		err := errors.New("user not authorized")
+		return campaign, err
+	}
+
+	updatedCampaign, err := u.repository.Update(campaign)
+	if err != nil {
+		return updatedCampaign, err
+	}
+
+	return updatedCampaign, nil
 }
