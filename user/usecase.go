@@ -21,7 +21,7 @@ func NewUsecase(repository Repository) *usecase {
 	return &usecase{repository}
 }
 
-func (s *usecase) RegisterUser(input RegisterUserInput) (User, error) {
+func (u *usecase) RegisterUser(input RegisterUserInput) (User, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.MinCost)
 	if err != nil {
 		return User{}, err
@@ -34,7 +34,7 @@ func (s *usecase) RegisterUser(input RegisterUserInput) (User, error) {
 		Role:         "user",
 	}
 
-	newUser, err := s.repository.Save(user)
+	newUser, err := u.repository.Save(user)
 	if err != nil {
 		return User{}, err
 	}
@@ -44,8 +44,8 @@ func (s *usecase) RegisterUser(input RegisterUserInput) (User, error) {
 	return newUser, nil
 }
 
-func (s *usecase) VerifyLogin(input LoginUserInput) (User, error) {
-	usr, err := s.repository.FindByEmail(input.Email)
+func (u *usecase) VerifyLogin(input LoginUserInput) (User, error) {
+	usr, err := u.repository.FindByEmail(input.Email)
 	if err != nil {
 		return usr, err
 	}
@@ -62,8 +62,8 @@ func (s *usecase) VerifyLogin(input LoginUserInput) (User, error) {
 	return usr, nil
 }
 
-func (s *usecase) IsEmailAvailable(input CheckEmailInput) (bool, error) {
-	usr, err := s.repository.FindByEmail(input.Email)
+func (u *usecase) IsEmailAvailable(input CheckEmailInput) (bool, error) {
+	usr, err := u.repository.FindByEmail(input.Email)
 	if err != nil {
 		return false, err
 	}
@@ -75,15 +75,15 @@ func (s *usecase) IsEmailAvailable(input CheckEmailInput) (bool, error) {
 	return true, nil
 }
 
-func (s *usecase) SaveAvatar(ID int, fileLocation string) (User, error) {
-	usr, err := s.repository.FindByID(ID)
+func (u *usecase) SaveAvatar(ID int, fileLocation string) (User, error) {
+	usr, err := u.repository.FindByID(ID)
 	if err != nil {
 		return usr, err
 	}
 
 	usr.AvatarFileName = fileLocation
 
-	updatedUser, err := s.repository.Update(usr)
+	updatedUser, err := u.repository.Update(usr)
 	if err != nil {
 		return updatedUser, err
 	}

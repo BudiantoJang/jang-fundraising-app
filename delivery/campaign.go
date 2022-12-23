@@ -17,7 +17,7 @@ func NewCampaignHandler(usecase campaign.Usecase) *campaignHandler {
 	return &campaignHandler{usecase}
 }
 
-func (h campaignHandler) GetCampaigns(c *gin.Context) {
+func (h *campaignHandler) GetCampaigns(c *gin.Context) {
 	userID, _ := strconv.Atoi(c.Query("user_id"))
 
 	campaigns, err := h.usecase.GetCampaigns(userID)
@@ -29,4 +29,8 @@ func (h campaignHandler) GetCampaigns(c *gin.Context) {
 
 	response := helper.APIResponse("list of campaigns", http.StatusOK, "success", campaign.FormatCampaigns(campaigns))
 	c.JSON(http.StatusOK, response)
+}
+
+func (h *campaignHandler) GetCampaignDetail(c *gin.Context) {
+
 }

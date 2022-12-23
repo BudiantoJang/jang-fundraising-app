@@ -1,6 +1,9 @@
 package campaign
 
-import "time"
+import (
+	"jangFundraising/user"
+	"time"
+)
 
 type Campaign struct {
 	ID             int
@@ -16,6 +19,7 @@ type Campaign struct {
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 	CampaignImages []CampaignImage
+	User           user.User
 }
 
 type CampaignImage struct {
@@ -25,4 +29,8 @@ type CampaignImage struct {
 	IsPrimary  int
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
+}
+
+type GetCampaignDetailInput struct {
+	ID int `uri:"id" binding:"required"`
 }
