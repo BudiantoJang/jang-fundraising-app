@@ -57,6 +57,7 @@ func main() {
 
 	campaigns := api.Group("/campaigns")
 	campaigns.GET("/", campaignHandler.GetCampaigns)
+	campaigns.GET("/:id", campaignHandler.GetCampaignDetail)
 
 	router.Run()
 }
