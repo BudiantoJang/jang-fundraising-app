@@ -3,29 +3,29 @@ package campaign
 import "strings"
 
 type CampaignFormatter struct {
-	ID             int    `json:"id"`
-	UserID         int    `json:"userId"`
-	Name           string `json:"name"`
-	Summary        string `json:"summary"`
-	ImageUrl       string `json:"imageUrl"`
-	GoalAmmount    int    `json:"goalAmmount"`
-	CurrentAmmount int    `json:"currentAmmount"`
-	Slug           string `json:"slug"`
+	ID            int    `json:"id"`
+	UserID        int    `json:"userId"`
+	Name          string `json:"name"`
+	Summary       string `json:"summary"`
+	ImageUrl      string `json:"imageUrl"`
+	GoalAmount    int    `json:"goalAmount"`
+	CurrentAmount int    `json:"currentAmount"`
+	Slug          string `json:"slug"`
 }
 
 type CampaignDetailFormatter struct {
-	ID             int                      `json:"id"`
-	Name           string                   `json:"name"`
-	Summary        string                   `json:"summary"`
-	Description    string                   `json:"description"`
-	ImageUrl       string                   `json:"imageUrl"`
-	GoalAmmount    int                      `json:"goalAmmount"`
-	CurrentAmmount int                      `json:"currentAmmount"`
-	UserID         int                      `json:"userId"`
-	Slug           string                   `json:"slug"`
-	Perks          []string                 `json:"perks"`
-	User           CampaignUserFormatter    `json:"user"`
-	Images         []CampaignImageFormatter `json:"image"`
+	ID            int                      `json:"id"`
+	Name          string                   `json:"name"`
+	Summary       string                   `json:"summary"`
+	Description   string                   `json:"description"`
+	ImageUrl      string                   `json:"imageUrl"`
+	GoalAmount    int                      `json:"goalAmount"`
+	CurrentAmount int                      `json:"currentAmount"`
+	UserID        int                      `json:"userId"`
+	Slug          string                   `json:"slug"`
+	Perks         []string                 `json:"perks"`
+	User          CampaignUserFormatter    `json:"user"`
+	Images        []CampaignImageFormatter `json:"image"`
 }
 
 type CampaignUserFormatter struct {
@@ -40,14 +40,14 @@ type CampaignImageFormatter struct {
 
 func FormatCampaign(campaign Campaign) CampaignFormatter {
 	formattedCampaign := CampaignFormatter{
-		ID:             campaign.ID,
-		UserID:         campaign.UserID,
-		Name:           campaign.Name,
-		Summary:        campaign.Summary,
-		ImageUrl:       "",
-		GoalAmmount:    campaign.GoalAmmount,
-		CurrentAmmount: campaign.CurrentAmmount,
-		Slug:           campaign.Slug,
+		ID:            campaign.ID,
+		UserID:        campaign.UserID,
+		Name:          campaign.Name,
+		Summary:       campaign.Summary,
+		ImageUrl:      "",
+		GoalAmount:    campaign.GoalAmount,
+		CurrentAmount: campaign.CurrentAmount,
+		Slug:          campaign.Slug,
 	}
 
 	if len(campaign.CampaignImages) > 0 {
@@ -71,14 +71,14 @@ func FormatCampaigns(campaigns []Campaign) []CampaignFormatter {
 
 func FormatCampaignDetail(campaign Campaign) CampaignDetailFormatter {
 	campaignDetailFormatter := CampaignDetailFormatter{
-		ID:             campaign.ID,
-		UserID:         campaign.UserID,
-		Name:           campaign.Name,
-		Summary:        campaign.Summary,
-		ImageUrl:       "",
-		GoalAmmount:    campaign.GoalAmmount,
-		CurrentAmmount: campaign.CurrentAmmount,
-		Slug:           campaign.Slug,
+		ID:            campaign.ID,
+		UserID:        campaign.UserID,
+		Name:          campaign.Name,
+		Summary:       campaign.Summary,
+		ImageUrl:      "",
+		GoalAmount:    campaign.GoalAmount,
+		CurrentAmount: campaign.CurrentAmount,
+		Slug:          campaign.Slug,
 	}
 
 	if len(campaign.CampaignImages) > 0 {

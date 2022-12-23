@@ -13,8 +13,8 @@ type Campaign struct {
 	Description    string
 	Perks          string
 	DonatorCount   int
-	GoalAmmount    int
-	CurrentAmmount int
+	GoalAmount     int
+	CurrentAmount  int
 	Slug           string
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
@@ -33,4 +33,13 @@ type CampaignImage struct {
 
 type GetCampaignDetailInput struct {
 	ID int `uri:"id" binding:"required"`
+}
+
+type CreateCampaignInput struct {
+	Name        string `json:"name"`
+	Summary     string `json:"summary"`
+	Description string `json:"description"`
+	GoalAmount  int    `json:"goalAmount"`
+	Perks       string `json:"perks"`
+	User        user.User
 }
