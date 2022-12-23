@@ -3,6 +3,7 @@ package delivery
 import (
 	"jangFundraising/campaign"
 	"jangFundraising/helper"
+	"jangFundraising/user"
 	"net/http"
 	"strconv"
 
@@ -49,5 +50,32 @@ func (h *campaignHandler) GetCampaignDetail(c *gin.Context) {
 	}
 
 	resp := helper.APIResponse("campaign detail", http.StatusOK, "success", campaign.FormatCampaignDetail(campaignDetail))
+	c.JSON(http.StatusOK, resp)
+}
+
+func (h *campaignHandler) CreateCampaign(c *gin.Context) {
+	var input campaign.CreateCampaignInput
+
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		errors := helper.FormatErrorValidation(err)
+		errorMessage := gin.H{"errors": errors}
+		resp := helper.APIResponse("failed creating new campaign", http.StatusBadRequest, "error", errorMessage)
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	currentUser := c.MustGet("currentUser").(user.User)
+
+	input.User = currentUser
+
+	newCampaign, err := h.usecase.CreateCampaign(input)
+	if err != nil {
+		resp := helper.APIResponse("failed creating new campaign", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	resp := helper.APIResponse("success creating new campaign", http.StatusOK, "success", campaign.FormatCampaign(newCampaign))
 	c.JSON(http.StatusOK, resp)
 }

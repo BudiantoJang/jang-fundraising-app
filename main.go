@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"jangFundraising/auth"
 	"jangFundraising/campaign"
 	"jangFundraising/delivery"
@@ -56,9 +55,10 @@ func main() {
 	user.POST("/email_check", userHandler.CheckEmailAvailability)
 	user.POST("/avatar", authMiddleware(*authUsecase, userRepository), userHandler.UploadAvatar)
 
-	campaigns := api.Group("/campaigns")
-	campaigns.GET("/", campaignHandler.GetCampaigns)
-	campaigns.GET("/:id", campaignHandler.GetCampaignDetail)
+	campaign := api.Group("/campaign")
+	campaign.GET("/", campaignHandler.GetCampaigns)
+	campaign.GET("/:id", campaignHandler.GetCampaignDetail)
+	campaign.POST("/", authMiddleware(*authUsecase, userRepository), campaignHandler.CreateCampaign)
 
 	router.Run()
 }

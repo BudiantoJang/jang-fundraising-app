@@ -36,10 +36,10 @@ type GetCampaignDetailInput struct {
 }
 
 type CreateCampaignInput struct {
-	Name        string `json:"name"`
-	Summary     string `json:"summary"`
-	Description string `json:"description"`
-	GoalAmount  int    `json:"goalAmount"`
-	Perks       string `json:"perks"`
+	Name        string `json:"name" binding:"required"`
+	Summary     string `json:"summary" binding:"required"`
+	Description string `json:"description" binding:"required"`
+	GoalAmount  int    `json:"goalAmount" binding:"required"`
+	Perks       string `json:"perks" binding:"required"`
 	User        user.User
 }
