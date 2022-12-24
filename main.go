@@ -77,8 +77,8 @@ func main() {
 
 	campaign.GET("/:id/transaction", authMiddleware(*authUsecase, userRepository), transactionHandler.GetCampaignTransactions)
 
-	transaction := api.Group("/transaction")
-	transaction.GET("/", authMiddleware(*authUsecase, userRepository), transactionHandler.GetUserTransactions)
+	transactions := api.Group("/transactions")
+	transactions.GET("/", authMiddleware(*authUsecase, userRepository), transactionHandler.GetUserTransactions)
 
 	router.Run()
 }

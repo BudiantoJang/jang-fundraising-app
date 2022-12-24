@@ -1,7 +1,6 @@
 package delivery
 
 import (
-	"fmt"
 	"jangFundraising/helper"
 	"jangFundraising/transaction"
 	"jangFundraising/user"
@@ -52,8 +51,7 @@ func (h *transactionHandler) GetUserTransactions(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, resp)
 		return
 	}
-	fmt.Println(transactions)
-	fmt.Println("AAAAA")
-	resp := helper.APIResponse("successfully retrieved user transactions detail", http.StatusOK, "success", transactions)
+
+	resp := helper.APIResponse("successfully retrieved user transactions detail", http.StatusOK, "success", transaction.FormatUserTransactions(transactions))
 	c.JSON(http.StatusOK, resp)
 }
