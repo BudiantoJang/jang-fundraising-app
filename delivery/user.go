@@ -118,7 +118,7 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 	file, err := c.FormFile("avatar")
 	if err != nil {
 		data := gin.H{"is_uploaded": false}
-		resp := helper.APIResponse("Failed saving avatar image", http.StatusBadRequest, "error", data)
+		resp := helper.APIResponse("failed saving avatar image", http.StatusBadRequest, "error", data)
 		c.JSON(http.StatusUnprocessableEntity, resp)
 		return
 	}
@@ -130,7 +130,7 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 	err = c.SaveUploadedFile(file, path)
 	if err != nil {
 		data := gin.H{"is_uploaded": false}
-		resp := helper.APIResponse("Failed saving avatar image", http.StatusBadRequest, "error", data)
+		resp := helper.APIResponse("failed saving avatar image", http.StatusBadRequest, "error", data)
 		c.JSON(http.StatusUnprocessableEntity, resp)
 		return
 	}
@@ -138,12 +138,12 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 	_, err = h.userService.SaveAvatar(currentUser.ID, path)
 	if err != nil {
 		data := gin.H{"is_uploaded": false}
-		resp := helper.APIResponse("Failed saving avatar image", http.StatusBadRequest, "error", data)
+		resp := helper.APIResponse("failed saving avatar image", http.StatusBadRequest, "error", data)
 		c.JSON(http.StatusUnprocessableEntity, resp)
 		return
 	}
 
 	data := gin.H{"is_uploaded": true}
-	resp := helper.APIResponse("Avatar successfully updated", http.StatusOK, "success", data)
+	resp := helper.APIResponse("avatar successfully updated", http.StatusOK, "success", data)
 	c.JSON(http.StatusOK, resp)
 }

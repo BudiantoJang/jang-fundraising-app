@@ -97,20 +97,29 @@ func (u *usecase) Update(inputID GetCampaignDetailInput, inputData CampaignInput
 }
 
 func (u *usecase) SaveCampaignImage(input CreateCampaignImageInput, fileLocation string) (CampaignImage, error) {
-	var isPrimary = 0
+	campaign, err := u.repository.FindByID(input.CampaignID)
+	if err != nil {
+		return CampaignImage{}, err
+	}
 
-	if input.IsPrimary {
+	if campaign.User.ID != input.User.ID {
+		return CampaignImage{}, errors.New("not the owner of campaign")
+	}
+
+	isPrimary := 0
+
+	if *input.IsPrimary {
+		isPrimary = 1
 		_, err := u.repository.MarkAllAsNonPrimary(input.CampaignID)
 		if err != nil {
 			return CampaignImage{}, err
 		}
-		isPrimary = 1
 	}
 
 	campaignImage := CampaignImage{
-		ID:        input.CampaignID,
-		IsPrimary: isPrimary,
-		FileName:  fileLocation,
+		CampaignID: input.CampaignID,
+		IsPrimary:  isPrimary,
+		FileName:   fileLocation,
 	}
 
 	newCampaignImage, err := u.repository.CreateImage(campaignImage)

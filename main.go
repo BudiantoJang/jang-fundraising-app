@@ -61,6 +61,9 @@ func main() {
 	campaign.POST("/", authMiddleware(*authUsecase, userRepository), campaignHandler.CreateCampaign)
 	campaign.PUT("/:id", authMiddleware(*authUsecase, userRepository), campaignHandler.UpdateCampaign)
 
+	campaignImage := api.Group("/campaignImage")
+	campaignImage.POST("/", authMiddleware(*authUsecase, userRepository), campaignHandler.UploadCampaignImage)
+
 	router.Run()
 }
 
