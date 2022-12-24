@@ -7,6 +7,7 @@ import (
 
 type Usecase interface {
 	GetTransactionsByCampaignID(input GetCampaignTransactionsInput) ([]Transaction, error)
+	GetTransactionsByUserID(userID int) ([]Transaction, error)
 }
 
 type usecase struct {
@@ -29,6 +30,15 @@ func (u *usecase) GetTransactionsByCampaignID(input GetCampaignTransactionsInput
 	}
 
 	transactions, err := u.repository.FindByCampaignID(input.ID)
+	if err != nil {
+		return transactions, err
+	}
+
+	return transactions, nil
+}
+
+func (u *usecase) GetTransactionsByUserID(userID int) ([]Transaction, error) {
+	transactions, err := u.repository.GetByUserID(userID)
 	if err != nil {
 		return transactions, err
 	}

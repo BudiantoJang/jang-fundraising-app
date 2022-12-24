@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"fmt"
 	"jangFundraising/helper"
 	"jangFundraising/transaction"
 	"jangFundraising/user"
@@ -22,7 +23,7 @@ func (h *transactionHandler) GetCampaignTransactions(c *gin.Context) {
 
 	err := c.ShouldBindUri(&input)
 	if err != nil {
-		resp := helper.APIResponse("failed getting 1 transactions detail", http.StatusBadRequest, "error", nil)
+		resp := helper.APIResponse("failed getting campaign transactions detail", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, resp)
 		return
 	}
@@ -32,11 +33,27 @@ func (h *transactionHandler) GetCampaignTransactions(c *gin.Context) {
 
 	transactions, err := h.usecase.GetTransactionsByCampaignID(input)
 	if err != nil {
-		resp := helper.APIResponse("failed getting 2 transactions detail", http.StatusBadRequest, "error", nil)
+		resp := helper.APIResponse("failed getting campaign transactions detail", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, resp)
 		return
 	}
 
-	resp := helper.APIResponse("successfully retrieved 3 detail", http.StatusOK, "success", transaction.FormatCampaignTransactions(transactions))
+	resp := helper.APIResponse("successfully retrieved campaign detail", http.StatusOK, "success", transaction.FormatCampaignTransactions(transactions))
+	c.JSON(http.StatusOK, resp)
+}
+
+func (h *transactionHandler) GetUserTransactions(c *gin.Context) {
+	currentUser := c.MustGet("currentUser").(user.User)
+	userID := currentUser.ID
+
+	transactions, err := h.usecase.GetTransactionsByUserID(userID)
+	if err != nil {
+		resp := helper.APIResponse("failed getting user transactions detail", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+	fmt.Println(transactions)
+	fmt.Println("AAAAA")
+	resp := helper.APIResponse("successfully retrieved user transactions detail", http.StatusOK, "success", transactions)
 	c.JSON(http.StatusOK, resp)
 }

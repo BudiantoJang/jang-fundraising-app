@@ -1,6 +1,7 @@
 package transaction
 
 import (
+	"jangFundraising/campaign"
 	"jangFundraising/user"
 	"time"
 )
@@ -15,6 +16,7 @@ type Transaction struct {
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 	User       user.User
+	Campaign   campaign.Campaign
 }
 
 type GetCampaignTransactionsInput struct {
