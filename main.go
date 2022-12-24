@@ -48,7 +48,7 @@ func main() {
 
 	// Transaction
 	transactionRepository := transaction.NewRepository(db)
-	transactionUsecase := transaction.NewUsecase(transactionRepository)
+	transactionUsecase := transaction.NewUsecase(transactionRepository, campaignRepository)
 	transactionHandler := delivery.NewTransactionHandler(transactionUsecase)
 
 	// Static Image Route
