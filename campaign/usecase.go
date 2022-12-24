@@ -12,6 +12,7 @@ type Usecase interface {
 	GetCampaignByID(input GetCampaignDetailInput) (Campaign, error)
 	CreateCampaign(input CampaignInput) (Campaign, error)
 	Update(inputID GetCampaignDetailInput, inputData CampaignInput) (Campaign, error)
+	SaveCampaignImage(input CreateCampaignImageInput, fileLocation string) (CampaignImage, error)
 }
 
 type usecase struct {
@@ -93,4 +94,30 @@ func (u *usecase) Update(inputID GetCampaignDetailInput, inputData CampaignInput
 	}
 
 	return updatedCampaign, nil
+}
+
+func (u *usecase) SaveCampaignImage(input CreateCampaignImageInput, fileLocation string) (CampaignImage, error) {
+	var isPrimary = 0
+
+	if input.IsPrimary {
+		_, err := u.repository.MarkAllAsNonPrimary(input.CampaignID)
+		if err != nil {
+			return CampaignImage{}, err
+		}
+		isPrimary = 1
+	}
+
+	campaignImage := CampaignImage{
+		ID:        input.CampaignID,
+		IsPrimary: isPrimary,
+		FileName:  fileLocation,
+	}
+
+	newCampaignImage, err := u.repository.CreateImage(campaignImage)
+	if err != nil {
+		return newCampaignImage, err
+	}
+
+	return newCampaignImage, nil
+
 }
