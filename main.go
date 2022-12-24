@@ -5,6 +5,7 @@ import (
 	"jangFundraising/campaign"
 	"jangFundraising/delivery"
 	"jangFundraising/helper"
+	"jangFundraising/transaction"
 	"jangFundraising/user"
 	"log"
 	"net/http"
@@ -45,16 +46,24 @@ func main() {
 	campaignUsecase := campaign.NewUsecase(campaignRepository)
 	campaignHandler := delivery.NewCampaignHandler(campaignUsecase)
 
+	// Transaction
+	transactionRepository := transaction.NewRepository(db)
+	transactionUsecase := transaction.NewUsecase(transactionRepository)
+	transactionHandler := delivery.NewTransactionHandler(transactionUsecase)
+
+	// Static Image Route
 	router := gin.Default()
 	router.Static("/images", "./images")
 	api := router.Group("/api/v1")
 
+	// User API Route
 	user := api.Group("/user")
 	user.POST("/", userHandler.RegisterUser)
 	user.POST("/sessions", userHandler.Login)
 	user.POST("/email_check", userHandler.CheckEmailAvailability)
 	user.POST("/avatar", authMiddleware(*authUsecase, userRepository), userHandler.UploadAvatar)
 
+	// Campaign API Route
 	campaign := api.Group("/campaign")
 	campaign.GET("/", campaignHandler.GetCampaigns)
 	campaign.GET("/:id", campaignHandler.GetCampaignDetail)
@@ -64,10 +73,14 @@ func main() {
 	campaignImage := api.Group("/campaignImage")
 	campaignImage.POST("/", authMiddleware(*authUsecase, userRepository), campaignHandler.UploadCampaignImage)
 
+	// Transaction API Route
+
+	campaign.GET("/:id/transaction", authMiddleware(*authUsecase, userRepository), transactionHandler.GetCampaignTransactions)
+
 	router.Run()
 }
 
-func authMiddleware(autService auth.JWTService, userService user.Repository) gin.HandlerFunc {
+func authMiddleware(autUsecase auth.JWTUsecase, userUsecase user.Repository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 
@@ -80,7 +93,7 @@ func authMiddleware(autService auth.JWTService, userService user.Repository) gin
 		bearer := strings.Split(authHeader, " ")
 		stringToken := bearer[1]
 
-		token, err := autService.ValidateToken(stringToken)
+		token, err := autUsecase.ValidateToken(stringToken)
 		if err != nil {
 			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
@@ -96,7 +109,7 @@ func authMiddleware(autService auth.JWTService, userService user.Repository) gin
 
 		userID := int(payload["user_id"].(float64))
 
-		user, err := userService.FindByID(userID)
+		user, err := userUsecase.FindByID(userID)
 		if err != nil {
 			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)

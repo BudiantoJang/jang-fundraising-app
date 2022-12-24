@@ -11,16 +11,16 @@ type Usecase interface {
 	ValidateToken(token string) (*jwt.Token, error)
 }
 
-type JWTService struct {
+type JWTUsecase struct {
 }
 
-func NewUsecase() *JWTService {
-	return &JWTService{}
+func NewUsecase() *JWTUsecase {
+	return &JWTUsecase{}
 }
 
 var SECRET_KEY = []byte("Budianto_Secret_Key")
 
-func (s *JWTService) GenerateToken(userID int) (string, error) {
+func (s *JWTUsecase) GenerateToken(userID int) (string, error) {
 	payload := jwt.MapClaims{}
 	payload["user_id"] = userID
 
@@ -34,7 +34,7 @@ func (s *JWTService) GenerateToken(userID int) (string, error) {
 	return signedToken, nil
 }
 
-func (s *JWTService) ValidateToken(token string) (*jwt.Token, error) {
+func (s *JWTUsecase) ValidateToken(token string) (*jwt.Token, error) {
 	validatedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
 		if !ok {

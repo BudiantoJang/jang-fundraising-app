@@ -11,12 +11,12 @@ import (
 )
 
 type userHandler struct {
-	userService user.Usecase
-	authService auth.JWTService
+	userUsecase user.Usecase
+	authUsecase auth.JWTUsecase
 }
 
-func NewUserHandler(userService user.Usecase, authService auth.JWTService) *userHandler {
-	return &userHandler{userService, authService}
+func NewUserHandler(userUsecase user.Usecase, authUsecase auth.JWTUsecase) *userHandler {
+	return &userHandler{userUsecase, authUsecase}
 }
 
 func (h *userHandler) RegisterUser(c *gin.Context) {
@@ -32,14 +32,14 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 		return
 	}
 
-	usr, err := h.userService.RegisterUser(input)
+	usr, err := h.userUsecase.RegisterUser(input)
 	if err != nil {
 		resp := helper.APIResponse("error while trying to register user", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, resp)
 		return
 	}
 
-	token, err := h.authService.GenerateToken(usr.ID)
+	token, err := h.authUsecase.GenerateToken(usr.ID)
 
 	if err != nil {
 		resp := helper.APIResponse("error while trying to register user", http.StatusBadRequest, "error", nil)
@@ -65,14 +65,14 @@ func (h *userHandler) Login(c *gin.Context) {
 		return
 	}
 
-	verifiedUser, err := h.userService.VerifyLogin(input)
+	verifiedUser, err := h.userUsecase.VerifyLogin(input)
 	if err != nil {
 		resp := helper.APIResponse("error verifying user", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, resp)
 		return
 	}
 
-	token, err := h.authService.GenerateToken(verifiedUser.ID)
+	token, err := h.authUsecase.GenerateToken(verifiedUser.ID)
 
 	if err != nil {
 		resp := helper.APIResponse("error while trying to login", http.StatusBadRequest, "error", nil)
@@ -98,7 +98,7 @@ func (h *userHandler) CheckEmailAvailability(c *gin.Context) {
 		return
 	}
 
-	isEmailAvailable, _ := h.userService.IsEmailAvailable(input)
+	isEmailAvailable, _ := h.userUsecase.IsEmailAvailable(input)
 
 	data := gin.H{
 		"isAvailable": isEmailAvailable,
@@ -135,7 +135,7 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 		return
 	}
 
-	_, err = h.userService.SaveAvatar(currentUser.ID, path)
+	_, err = h.userUsecase.SaveAvatar(currentUser.ID, path)
 	if err != nil {
 		data := gin.H{"is_uploaded": false}
 		resp := helper.APIResponse("failed saving avatar image", http.StatusBadRequest, "error", data)
