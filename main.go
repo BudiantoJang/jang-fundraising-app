@@ -79,6 +79,7 @@ func main() {
 
 	transactions := api.Group("/transactions")
 	transactions.GET("/", authMiddleware(*authUsecase, userRepository), transactionHandler.GetUserTransactions)
+	transactions.POST("/", authMiddleware(*authUsecase, userRepository), transactionHandler.CreateTransaction)
 
 	router.Run()
 }

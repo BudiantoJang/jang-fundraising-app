@@ -8,6 +8,7 @@ import (
 type Usecase interface {
 	GetTransactionsByCampaignID(input GetCampaignTransactionsInput) ([]Transaction, error)
 	GetTransactionsByUserID(userID int) ([]Transaction, error)
+	CreateTransaction(input CreateTransactionInput) (Transaction, error)
 }
 
 type usecase struct {
@@ -44,4 +45,21 @@ func (u *usecase) GetTransactionsByUserID(userID int) ([]Transaction, error) {
 	}
 
 	return transactions, nil
+}
+
+func (u *usecase) CreateTransaction(input CreateTransactionInput) (Transaction, error) {
+	transaction := Transaction{
+		CampaignID: input.CampaignID,
+		Amount:     input.Amount,
+		UserID:     input.User.ID,
+		Status:     "pending",
+	}
+
+	newTransaction, err := u.repository.Save(transaction)
+	if err != nil {
+		return newTransaction, err
+	}
+
+	return newTransaction, nil
+
 }

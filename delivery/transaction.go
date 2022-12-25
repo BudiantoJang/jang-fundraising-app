@@ -55,3 +55,28 @@ func (h *transactionHandler) GetUserTransactions(c *gin.Context) {
 	resp := helper.APIResponse("successfully retrieved user transactions detail", http.StatusOK, "success", transaction.FormatUserTransactions(transactions))
 	c.JSON(http.StatusOK, resp)
 }
+
+func (h *transactionHandler) CreateTransaction(c *gin.Context) {
+	var input transaction.CreateTransactionInput
+
+	currentUser := c.MustGet("currentUser").(user.User)
+
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		resp := helper.APIResponse("failed binding payload", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	input.User = currentUser
+
+	newTransaction, err := h.usecase.CreateTransaction(input)
+	if err != nil {
+		resp := helper.APIResponse("failed creating new transaction", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	resp := helper.APIResponse("successfully created new transaction", http.StatusOK, "success", newTransaction)
+	c.JSON(http.StatusOK, resp)
+}
