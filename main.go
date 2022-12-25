@@ -5,6 +5,7 @@ import (
 	"jangFundraising/campaign"
 	"jangFundraising/delivery"
 	"jangFundraising/helper"
+	"jangFundraising/payment"
 	"jangFundraising/transaction"
 	"jangFundraising/user"
 	"log"
@@ -35,7 +36,10 @@ func main() {
 	//Middleware
 	authUsecase := auth.NewUsecase()
 
-	//User
+	// Payment
+	paymentUsecase := payment.NewUsecase()
+
+	// User
 	userRepository := user.NewRepository(db)
 	userUsecase := user.NewUsecase(userRepository)
 	userHandler := delivery.NewUserHandler(userUsecase, *authUsecase)
@@ -48,7 +52,7 @@ func main() {
 
 	// Transaction
 	transactionRepository := transaction.NewRepository(db)
-	transactionUsecase := transaction.NewUsecase(transactionRepository, campaignRepository)
+	transactionUsecase := transaction.NewUsecase(transactionRepository, campaignRepository, paymentUsecase)
 	transactionHandler := delivery.NewTransactionHandler(transactionUsecase)
 
 	// Static Image Route

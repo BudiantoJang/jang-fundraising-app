@@ -3,6 +3,7 @@ package transaction
 import (
 	"errors"
 	"jangFundraising/campaign"
+	"jangFundraising/payment"
 )
 
 type Usecase interface {
@@ -14,10 +15,11 @@ type Usecase interface {
 type usecase struct {
 	repository         Repository
 	campaignRepository campaign.Repository
+	paymentUsecase     payment.Usecase
 }
 
-func NewUsecase(repository Repository, campaignRepository campaign.Repository) *usecase {
-	return &usecase{repository, campaignRepository}
+func NewUsecase(repository Repository, campaignRepository campaign.Repository, paymentUsecase payment.Usecase) *usecase {
+	return &usecase{repository, campaignRepository, paymentUsecase}
 }
 
 func (u *usecase) GetTransactionsByCampaignID(input GetCampaignTransactionsInput) ([]Transaction, error) {
@@ -54,8 +56,24 @@ func (u *usecase) CreateTransaction(input CreateTransactionInput) (Transaction, 
 		UserID:     input.User.ID,
 		Status:     "pending",
 	}
-
 	newTransaction, err := u.repository.Save(transaction)
+	if err != nil {
+		return newTransaction, err
+	}
+
+	paymentTransaction := payment.Transaction{
+		ID:     newTransaction.ID,
+		Amount: newTransaction.Amount,
+	}
+
+	paymentUrl, err := u.paymentUsecase.GetPaymentUrl(paymentTransaction, input.User)
+	if err != nil {
+		return newTransaction, err
+	}
+
+	newTransaction.PaymentUrl = paymentUrl
+
+	newTransaction, err = u.repository.Update(newTransaction)
 	if err != nil {
 		return newTransaction, err
 	}
