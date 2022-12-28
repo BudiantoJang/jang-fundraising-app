@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"fmt"
 	"jangFundraising/helper"
 	"jangFundraising/transaction"
 	"jangFundraising/user"
@@ -13,8 +14,8 @@ type transactionHandler struct {
 	usecase transaction.Usecase
 }
 
-func NewTransactionHandler(service transaction.Usecase) *transactionHandler {
-	return &transactionHandler{service}
+func NewTransactionHandler(usecase transaction.Usecase) *transactionHandler {
+	return &transactionHandler{usecase}
 }
 
 func (h *transactionHandler) GetCampaignTransactions(c *gin.Context) {
@@ -79,4 +80,24 @@ func (h *transactionHandler) CreateTransaction(c *gin.Context) {
 
 	resp := helper.APIResponse("successfully created new transaction", http.StatusOK, "success", transaction.FormatTransaction(newTransaction))
 	c.JSON(http.StatusOK, resp)
+}
+
+func (h *transactionHandler) GetNotification(c *gin.Context) {
+	var input transaction.TransactionNotificationInput
+
+	err := c.ShouldBindJSON(&input)
+
+	fmt.Println(input)
+	if err != nil {
+		resp := helper.APIResponse("failed processing notification", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, resp)
+	}
+
+	err = h.usecase.GetPaymentProcess(input)
+	if err != nil {
+		resp := helper.APIResponse("failed processing notification", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, resp)
+	}
+
+	c.JSON(http.StatusOK, input)
 }

@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"gorm.io/driver/mysql"
@@ -19,7 +20,7 @@ import (
 )
 
 func main() {
-	dsn := "root:Pasuruan_123@tcp(127.0.0.1:3306)/fundraising?charset=utf8mb4&parseTime=True&loc=Local"
+	// dsn := "user:password@tcp(server:port)/dbname?charset=utf8mb4&parseTime=True&loc=Local" INPUT YOUR DB CONN HERE
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
@@ -36,9 +37,6 @@ func main() {
 	//Middleware
 	authUsecase := auth.NewUsecase()
 
-	// Payment
-	paymentUsecase := payment.NewUsecase()
-
 	// User
 	userRepository := user.NewRepository(db)
 	userUsecase := user.NewUsecase(userRepository)
@@ -52,11 +50,14 @@ func main() {
 
 	// Transaction
 	transactionRepository := transaction.NewRepository(db)
+	// Payment
+	paymentUsecase := payment.NewUsecase(campaignRepository)
 	transactionUsecase := transaction.NewUsecase(transactionRepository, campaignRepository, paymentUsecase)
 	transactionHandler := delivery.NewTransactionHandler(transactionUsecase)
 
 	// Static Image Route
 	router := gin.Default()
+	router.Use(cors.Default())
 	router.Static("/images", "./images")
 	api := router.Group("/api/v1")
 
@@ -84,6 +85,7 @@ func main() {
 	transactions := api.Group("/transactions")
 	transactions.GET("/", authMiddleware(*authUsecase, userRepository), transactionHandler.GetUserTransactions)
 	transactions.POST("/", authMiddleware(*authUsecase, userRepository), transactionHandler.CreateTransaction)
+	transactions.POST("/notification", transactionHandler.GetNotification)
 
 	router.Run()
 }

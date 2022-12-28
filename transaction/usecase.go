@@ -2,14 +2,17 @@ package transaction
 
 import (
 	"errors"
+	"fmt"
 	"jangFundraising/campaign"
 	"jangFundraising/payment"
+	"strconv"
 )
 
 type Usecase interface {
 	GetTransactionsByCampaignID(input GetCampaignTransactionsInput) ([]Transaction, error)
 	GetTransactionsByUserID(userID int) ([]Transaction, error)
 	CreateTransaction(input CreateTransactionInput) (Transaction, error)
+	GetPaymentProcess(input TransactionNotificationInput) error
 }
 
 type usecase struct {
@@ -56,6 +59,7 @@ func (u *usecase) CreateTransaction(input CreateTransactionInput) (Transaction, 
 		UserID:     input.User.ID,
 		Status:     "pending",
 	}
+
 	newTransaction, err := u.repository.Save(transaction)
 	if err != nil {
 		return newTransaction, err
@@ -80,4 +84,49 @@ func (u *usecase) CreateTransaction(input CreateTransactionInput) (Transaction, 
 
 	return newTransaction, nil
 
+}
+
+func (u *usecase) GetPaymentProcess(input TransactionNotificationInput) error {
+	fmt.Println(input)
+	transactonID, _ := strconv.Atoi(input.OrderID)
+	fmt.Println(transactonID)
+	trans, err := u.repository.GetByID(transactonID)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(trans)
+	if input.PaymentType == "credit_card" && input.TransactionStatus == "capture" && input.FraudStatus == "accept" {
+		trans.Status = "paid"
+	} else if input.TransactionStatus == "settlement" {
+		trans.Status = "paid"
+	} else if input.TransactionStatus == "deny" || input.TransactionStatus == "expire" || input.TransactionStatus == "cancel" {
+		trans.Status = "cancelled"
+	}
+	fmt.Println(trans.Status)
+
+	updatedTrans, err := u.repository.Update(trans)
+	if err != nil {
+		return err
+	}
+	fmt.Println(updatedTrans)
+
+	campaign, err := u.campaignRepository.FindByID(updatedTrans.CampaignID)
+	if err != nil {
+		return err
+	}
+	fmt.Println(campaign)
+
+	if updatedTrans.Status == "paid" {
+		campaign.DonatorCount = campaign.DonatorCount + 1
+		campaign.CurrentAmount = campaign.CurrentAmount + updatedTrans.Amount
+		fmt.Println(campaign)
+
+		_, err := u.campaignRepository.Update(campaign)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

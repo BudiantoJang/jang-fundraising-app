@@ -1,6 +1,7 @@
 package payment
 
 import (
+	"jangFundraising/campaign"
 	"jangFundraising/user"
 	"strconv"
 
@@ -12,20 +13,17 @@ type Usecase interface {
 }
 
 type usecase struct {
+	campaignRepository campaign.Repository
 }
 
-func NewUsecase() *usecase {
-	return &usecase{}
+func NewUsecase(campaignRepository campaign.Repository) *usecase {
+	return &usecase{campaignRepository}
 }
 
 func (u *usecase) GetPaymentUrl(transaction Transaction, user user.User) (string, error) {
-	// secret, err := u.readMidtransSecret()
-	// if err != nil {
-	// 	return "", err
-	// }
 	midclient := midtrans.NewClient()
-	midclient.ServerKey = ""
-	midclient.ClientKey = ""
+	midclient.ServerKey = "" // INPUT MIDTRANS SERVER KEY
+	midclient.ClientKey = "" // INPUT MIDTRANS CLIENT KEY
 	midclient.APIEnvType = midtrans.Sandbox
 	snapGateway := midtrans.SnapGateway{
 		Client: midclient,
@@ -49,25 +47,3 @@ func (u *usecase) GetPaymentUrl(transaction Transaction, user user.User) (string
 
 	return snapTokenResp.RedirectURL, err
 }
-
-// func (u *usecase) readMidtransSecret() (MidtransSecret, error) {
-// 	var secret MidtransSecret
-// 	yamlFile, err := ioutil.ReadFile("secret.yaml")
-// 	if err != nil {
-// 		return MidtransSecret{}, err
-// 	}
-
-// 	data := make(map[interface{}]interface{})
-
-// 	err = yaml.Unmarshal(yamlFile, &data)
-// 	if err != nil {
-// 		return MidtransSecret{}, err
-// 	}
-
-// 	secret.MerchantID = fmt.Sprint(data["merchantId"])
-// 	secret.ClientKey = fmt.Sprint(data["clientKey"])
-// 	secret.ServerKey = fmt.Sprint(data["serverKey"])
-
-// 	return secret, nil
-
-// }
