@@ -3,6 +3,7 @@ package payment
 import (
 	"jangFundraising/campaign"
 	"jangFundraising/user"
+	"os"
 	"strconv"
 
 	"github.com/veritrans/go-midtrans"
@@ -22,8 +23,8 @@ func NewUsecase(campaignRepository campaign.Repository) *usecase {
 
 func (u *usecase) GetPaymentUrl(transaction Transaction, user user.User) (string, error) {
 	midclient := midtrans.NewClient()
-	midclient.ServerKey = "" // INPUT MIDTRANS SERVER KEY
-	midclient.ClientKey = "" // INPUT MIDTRANS CLIENT KEY
+	midclient.ServerKey = os.Getenv("MIDTRANS_SERVER_KEY")
+	midclient.ClientKey = os.Getenv("MIDTRANS_CLIENT_KEY")
 	midclient.APIEnvType = midtrans.Sandbox
 	snapGateway := midtrans.SnapGateway{
 		Client: midclient,

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"jangFundraising/auth"
 	"jangFundraising/campaign"
 	"jangFundraising/delivery"
@@ -10,6 +11,7 @@ import (
 	"jangFundraising/user"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gin-contrib/cors"
@@ -21,6 +23,13 @@ import (
 
 func main() {
 	// dsn := "user:password@tcp(server:port)/dbname?charset=utf8mb4&parseTime=True&loc=Local" INPUT YOUR DB CONN HERE
+	dbUser := os.Getenv("DB_USER")
+	dbPasswrod := os.Getenv("DB_PASSWORD")
+	dbServer := os.Getenv("DB_SERVER")
+	dbPort := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
+
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPasswrod, dbServer, dbPort, dbName)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
