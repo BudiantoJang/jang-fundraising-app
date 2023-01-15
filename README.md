@@ -43,6 +43,9 @@ This is a simple back-end system for fundraising application that allows users t
 
 The API documentation for this project can be accessed from : [POSTMAN COLLECTION](https://documenter.getpostman.com/view/15849991/TzXzDq8o)
 
+## Deployment
+This project is deployed on Railways and can be accessed from : [https://jangg-fundraising-production.up.railway.app/api/v1](https://jangg-fundraising-production.up.railway.app/api/v1)
+
 ## Future Update
 
 - [ ] Add unit test
